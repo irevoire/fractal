@@ -36,28 +36,23 @@ impl Mandel {
             let mut z = Complex::new(x, y);
             let mut i = 0;
 
-            let mut distance: u32 = 0;
-            let mut last_point = z.clone();
+            let mut angles: u32 = 0;
+            let mut last_point = z;
+            z = z * z + c;
+            let mut antepenultimate_point = z;
 
             while ((z * z).re <= 4.0) && i < self.iter {
                 z = z * z + c;
 
-                distance = distance.saturating_add((z + last_point).norm() as u32);
+                let angle = (z - last_point).atan() - (antepenultimate_point - last_point).atan();
+                angles = angles.saturating_add(angle.to_polar().1 as u32);
+                antepenultimate_point = last_point;
                 last_point = z;
 
                 i += 1;
             }
 
-            *val = distance;
-
-            /*
-            if i == self.iter {
-                // println!("inside mandelbrot with a distance of {}", distance);
-                *val = distance;
-            } else {
-                *val = i;
-            }
-            */
+            *val = angles / i;
         })
     }
 }
